@@ -61,20 +61,44 @@ form > input{
   /* color: #fff; */
 }
 
+#addBtn:hover{
+  color: white;
+  box-shadow: 2px 2px 5px rgb(187, 226, 247);
+}
+
 
 #sortBtn{
   background-color: transparent;
   border: 1px solid rgb(45, 173, 242);
   width: 40px;
   border-radius: 8px;
+  cursor: pointer;
   display: none;
-  
+}
+#sortBtn:hover{
+  background-color: rgb(187, 226, 247);
 }
 
 #sort-img{
   width: 20px;
   height: 20px;
+}
 
+#resetBtn{
+  background-color: transparent;
+  border: 1px solid rgb(45, 173, 242);
+  width: 40px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+#resetBtn:hover{
+  background-color: rgb(187, 226, 247);
+}
+
+#reset-img{
+  width: 20px;
+  height: 20px;
 }
 
 #warning {
@@ -89,7 +113,7 @@ form > input{
   width: 100%;
   margin: 1rem 0 0;
   padding: 0;
-  background-color: antiquewhite;
+  /* background-color: antiquewhite; */
 }
 
 li {
@@ -104,11 +128,14 @@ li {
   width: 20px;
   height: 20px;
   cursor: pointer;
+  display: inline-block;
+  flex-shrink: 0;
 }
 label {
-  font-size: 1rem;
+  font-size: 1.4rem;
   margin-left: 1.2rem;
-  
+  line-height: 1.4;
+
 }
 .edit-input-field{
   padding: 0.4rem;
@@ -116,6 +143,8 @@ label {
 }
 .imgBtnContainer{
   margin-left: auto;
+  display: flex;
+
 }
 .edit-btn, .delete-btn{
   width: 20px;
@@ -152,24 +181,61 @@ footer > small > a:hover {
     width: 30px;
     height: 30px;
   }
+  #warning{
+    padding: 0.1rem 0 0 4rem;
+  }
 }
 
 @media screen and (min-width: 576px){
   form > button{
     width: 15%;
   }
+
+  #warning{
+    padding: 0.1rem 0 0 5rem;
+  }
+  #todo-container{
+    width: 90%;
+  }
 }
 
 
 @media screen and (min-width: 768px) {
   #todo-container{
+    width: 70%;
+  }
+  #warning{
+    padding: 0.1rem 0 0 4rem;
+  }
+}
+
+@media screen and (min-width: 992px){
+  #warning{
+    padding: 0.1rem 0 0 5rem;
+  }
+  #todo-container{
     width: 60%;
   }
 }
-@media screen and (min-width: 1400px) {
+@media screen and (min-width: 1200px){
+  #warning{
+    padding: 0.1rem 0 0 5.6rem;
+  }
+  #todo-container{
+    width: 50%;
+  }
+}
 
+
+@media screen and (min-width: 1400px) {
   form > button{
     width: 10%;
+  }
+  #warning{
+    padding: 0.1rem 0 0 7rem;
+  }
+  #todo-container{
+    width: 40%;
   }
 }
 

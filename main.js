@@ -3,10 +3,16 @@ const addBtn = document.getElementById('addBtn')
 const todoList = document.getElementById('todo-list-container')
 const sortBtn = document.getElementById('sortBtn')
 
+let isReversed = false
+
+//Load the saved list from localStorage when the page loads
+window.addEventListener('DOMContentLoaded', () => {
+  loadTodoList()
+  updateSortBtnVisibility()
+})
+
 //show sort button if there are more than 2 list
 function updateSortBtnVisibility(){
-  const todoList = document.getElementById('todo-list-container')
-
   const itemCount = todoList.children.length
 
   if(itemCount > 1){
@@ -15,11 +21,59 @@ function updateSortBtnVisibility(){
     sortBtn.style.display = 'none'
   }
 }
+// Save the list to localStorage
+function saveTodoList(){
+  const todos = []
+  const lists = Array.from(todoList.children)
+  lists.forEach(list => {
+    const labelText = list.querySelector('label').innerText
+    const isChecked = list.querySelector('input[type="checkbox"]').checked
+    todos.push({labelText, isChecked})
+  })
+  localStorage.setItem('todoList', JSON.stringify(todos))
+}
+
+//Load the list from localStorage
+function loadTodoList(){
+  const savedTodos = JSON.parse(localStorage.getItem('todoList'))
+  if(savedTodos){
+    savedTodos.forEach(todo => {
+      const listTag = document.createElement('li')
+      const inputTag = document.createElement('input')
+      inputTag.type = 'checkbox'
+      inputTag.classList.add('checkbox')
+      inputTag.checked = todo.isChecked
+
+      const labelTag = document.createElement('label')
+      labelTag.innerText = todo.labelText
+
+      const divTag = document.createElement('div')
+      divTag.classList.add('imgBtnContainer')
+
+      const editBtn = document.createElement('img')
+      editBtn.src = 'https://img.icons8.com/?size=100&id=42799&format=png&color=000000'
+      editBtn.alt = 'edit icon'
+      editBtn.classList.add('edit-btn')
+
+      const deleteBtn = document.createElement('img')
+      deleteBtn.src = 'https://img.icons8.com/?size=100&id=104338&format=png&color=000000'
+      deleteBtn.alt = 'delete icon'
+      deleteBtn.classList.add('delete-btn')
+
+    //add elements to listTag
+      listTag.appendChild(inputTag)
+      listTag.appendChild(labelTag)
+      divTag.appendChild(editBtn)
+      divTag.appendChild(deleteBtn)
+      listTag.appendChild(divTag) 
+
+      todoList.appendChild(listTag)
+    })
+  }
+}
 
 //reverse list order
 function reverseListOrder(){
-  const todoList = document.getElementById('todo-list-container')
-  
   const lists = Array.from(todoList.children)
   console.log('lists:', lists)
   lists.reverse()
@@ -27,6 +81,7 @@ function reverseListOrder(){
   todoList.innerHTML = ''
 
   lists.forEach(list => todoList.appendChild(list))
+  isReversed = !isReversed
 }
 
 sortBtn.addEventListener('click', (e) => {
@@ -79,12 +134,19 @@ addBtn.addEventListener('click', (e)=>{
   listTag.appendChild(divTag)
 
 //add li to todoList(.todo-list-container)
-  todoList.appendChild(listTag)
+if(isReversed){
+  todoList.prepend(listTag)
+}else{
+  todoList.append(listTag)
+}
+
+  
 
 //reset input value
   inputText.value = ''
   
   updateSortBtnVisibility()
+  saveTodoList()
 })
 
 
@@ -108,6 +170,7 @@ todoList.addEventListener('click', (e) => {
         const newLabel = document.createElement('label')
         newLabel.innerText = newText
         li.replaceChild(newLabel, input)
+        saveTodoList()
       }
     })
     //while editing mode, outside of the input field is clicked, it saves and change input tag to label tag
@@ -122,6 +185,7 @@ todoList.addEventListener('click', (e) => {
         }
 
         document.removeEventListener('click', outsideClickListener)
+        saveTodoList()
       }
     }, true)
   }
@@ -132,6 +196,7 @@ todoList.addEventListener('click', (e) => {
     todoList.removeChild(li)
   }
   updateSortBtnVisibility()
+  saveTodoList()
 })
 
 //double click to edit list
@@ -152,6 +217,7 @@ todoList.addEventListener('dblclick', (e)=>{
       const newLabel = document.createElement('label')
       newLabel.innerText = newText
       input.replaceWith(newLabel)
+      saveTodoList()
     })
 
     input.addEventListener('keydown', (e) => {
@@ -160,6 +226,7 @@ todoList.addEventListener('dblclick', (e)=>{
         const newLabel = document.createElement('label')
         newLabel.innerText = newText
         input.replaceWith(newLabel)
+        saveTodoList()
       }
     })
   }
