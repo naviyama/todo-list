@@ -2,7 +2,7 @@ const inputText = document.getElementById('inputText')
 const addBtn = document.getElementById('addBtn')
 const todoList = document.getElementById('todo-list-container')
 const sortBtn = document.getElementById('sortBtn')
-
+const resetBtn = document.getElementById('resetBtn')
 let isReversed = false
 
 //Load the saved list from localStorage when the page loads
@@ -21,12 +21,13 @@ function updateSortBtnVisibility(){
     sortBtn.style.display = 'none'
   }
 }
+
 // Save the list to localStorage
 function saveTodoList(){
   const todos = []
   const lists = Array.from(todoList.children)
   lists.forEach(list => {
-    const labelText = list.querySelector('label').innerText
+    const labelText = list.querySelector('input').innerText
     const isChecked = list.querySelector('input[type="checkbox"]').checked
     todos.push({labelText, isChecked})
   })
@@ -75,7 +76,7 @@ function loadTodoList(){
 //reverse list order
 function reverseListOrder(){
   const lists = Array.from(todoList.children)
-  console.log('lists:', lists)
+  // console.log('lists:', lists)
   lists.reverse()
 
   todoList.innerHTML = ''
@@ -89,10 +90,17 @@ sortBtn.addEventListener('click', (e) => {
   reverseListOrder()
 })
 
+resetBtn.addEventListener('click', (e) => {
+  e.preventDefault()
+  localStorage.removeItem("todoList")
+  todoList.innerHTML = ''
+  updateSortBtnVisibility()
+  isReversed = false
+})
+
 
 addBtn.addEventListener('click', (e)=>{
   e.preventDefault()
-
   const warning = document.getElementById('warning')
   const trimmedInputText = inputText.value.trim()
 
@@ -107,10 +115,8 @@ addBtn.addEventListener('click', (e)=>{
   const inputTag = document.createElement('input')
   inputTag.type = 'checkbox'
   inputTag.classList.add('checkbox')
-
   const labelTag = document.createElement('label')
   labelTag.innerText = inputText.value
-  
   
   //create edit and delete container and btns
   const divTag = document.createElement('div')
@@ -126,23 +132,21 @@ addBtn.addEventListener('click', (e)=>{
   deleteBtn.alt = 'delete icon'
   deleteBtn.classList.add('delete-btn')
 
-//add elements to listTag
+  //add elements to listTag
   listTag.appendChild(inputTag)
   listTag.appendChild(labelTag)
   divTag.appendChild(editBtn)
   divTag.appendChild(deleteBtn)
   listTag.appendChild(divTag)
 
-//add li to todoList(.todo-list-container)
-if(isReversed){
-  todoList.prepend(listTag)
-}else{
-  todoList.append(listTag)
-}
+  //add li to todoList(.todo-list-container)
+  if(isReversed){
+    todoList.prepend(listTag)
+  }else{
+    todoList.append(listTag)
+  }
 
-  
-
-//reset input value
+  //reset input value
   inputText.value = ''
   
   updateSortBtnVisibility()
@@ -154,7 +158,15 @@ todoList.addEventListener('click', (e) => {
   //edit button clicked
   if(e.target.classList.contains('edit-btn')){
     const li = e.target.closest('li')
+    if(!li){
+      console.error('li element not found')
+      return
+    }
     const label = li.querySelector('label')
+    if(!label){
+      console.error('label element not found')
+      return
+    }
     const currentText = label.innerText
 
     const input = document.createElement('input')
@@ -173,7 +185,7 @@ todoList.addEventListener('click', (e) => {
         saveTodoList()
       }
     })
-    //while editing mode, outside of the input field is clicked, it saves and change input tag to label tag
+    //while editing mode, outside of the input field is clicked, it saves and changes input tag to label tag
     document.addEventListener('click', function outsideClickListener(e){
       if(e.target !== input){
         const newText = input.value
@@ -212,33 +224,27 @@ todoList.addEventListener('dblclick', (e)=>{
     label.replaceWith(input)
     input.focus()
 
-    input.addEventListener('blur', ()=>{
+    let isReplaced = false
+
+    const replaceInputWithLabel = () => {
+      if(isReplaced) return
+      isReplaced = true
       const newText = input.value
       const newLabel = document.createElement('label')
       newLabel.innerText = newText
       input.replaceWith(newLabel)
       saveTodoList()
+    }
+    
+    input.addEventListener('blur', ()=>{
+      replaceInputWithLabel()
     })
 
     input.addEventListener('keydown', (e) => {
       if(e.key === 'Enter'){
-        const newText = input.value
-        const newLabel = document.createElement('label')
-        newLabel.innerText = newText
-        input.replaceWith(newLabel)
-        saveTodoList()
+        replaceInputWithLabel()
+        input.removeEventListener('blur', replaceInputWithLabel)
       }
     })
   }
 })
-
-
-
-{/* <li>
-  <input type="checkbox" />
-  <label htmlFor="">inputText.value</label>
-  <div class='imgBtnContainer'>
-    <img id='editBtn' src="" alt="" />
-    <img id='deleteBtn' src="" alt="" />
-  </div>
-</li> */}
